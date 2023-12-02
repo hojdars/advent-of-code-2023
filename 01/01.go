@@ -7,20 +7,45 @@ import (
 	"os"
 )
 
+func checkForWord(line string, i int, find string) bool {
+	return len(line) >= i+len(find) && line[i:i+len(find)] == find
+}
+
+func updateFirstLast(value, firstIn int) (first, last int) {
+	if firstIn == -1 {
+		first = value
+		last = value
+	} else {
+		first = firstIn
+		last = value
+	}
+	return
+}
+
+var letters = [...]string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+
 func ParseLine(line string) (int, error) {
 	first := -1
 	last := -1
 
-	for _, char := range line {
-		if !(char >= '0' && char <= '9') {
+	for i := 0; i < len(line); {
+		if line[i] >= '0' && line[i] <= '9' {
+			first, last = updateFirstLast(int(line[i]-'0'), first)
+			i += 1
 			continue
-		}
-
-		if first == -1 {
-			first = int(char - '0')
-			last = int(char - '0')
 		} else {
-			last = int(char - '0')
+			found := false
+			for index, number := range letters {
+				if checkForWord(line, i, number) {
+					first, last = updateFirstLast(index+1, first)
+					i += len(number) - 1
+					found = true
+					break
+				}
+			}
+			if !found {
+				i += 1
+			}
 		}
 	}
 
@@ -47,7 +72,6 @@ func main() {
 			fmt.Println("error encountered, exit")
 			return
 		}
-
 		sum += num
 	}
 

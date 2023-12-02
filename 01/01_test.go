@@ -26,13 +26,28 @@ func TestLineRead(t *testing.T) {
 		input := "739"
 		compare(t, input, 79)
 	})
+
+	t.Run("numbers as words mixed in", func(t *testing.T) {
+		compare(t, "one2", 12)
+		compare(t, "two1nine", 29)
+		compare(t, "eightwothree", 83)
+		compare(t, "abcone2threexyz", 13)
+		compare(t, "xtwone3four", 24)
+		compare(t, "4nineeightseven2", 42)
+		compare(t, "zoneight234", 14)
+		compare(t, "7pqrstsixteen", 76)
+		compare(t, "1onebfjtdslkdbthree4jvvonezqdthreesrghnnbsix", 16)
+		compare(t, "oneight", 18)
+		compare(t, "oneightwoneight", 18)
+	})
 }
 
 func compare(t *testing.T, input string, want int) {
+	t.Helper()
 	got, err := ParseLine(input)
 
 	if err != nil {
-		t.Errorf("number not found")
+		t.Fatal("number not found")
 	}
 
 	if got != want {
