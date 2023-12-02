@@ -1,6 +1,11 @@
-package day_one
+package main
 
-import "errors"
+import (
+	"bufio"
+	"errors"
+	"fmt"
+	"os"
+)
 
 func ParseLine(line string) (int, error) {
 	first := -1
@@ -24,4 +29,27 @@ func ParseLine(line string) (int, error) {
 	} else {
 		return 10*first + last, nil
 	}
+}
+
+func main() {
+	file, err := os.Open("input/input.txt")
+	if err != nil {
+		fmt.Println("error opening file")
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+
+	sum := 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		num, err := ParseLine(line)
+		if err != nil {
+			fmt.Println("error encountered, exit")
+			return
+		}
+
+		sum += num
+	}
+
+	fmt.Println(sum)
 }

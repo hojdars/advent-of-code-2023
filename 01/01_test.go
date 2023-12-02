@@ -1,4 +1,4 @@
-package day_one
+package main
 
 import "testing"
 
@@ -20,6 +20,11 @@ func TestLineRead(t *testing.T) {
 		if err == nil {
 			t.Errorf("wanted error, got nil and value %d", got)
 		}
+	})
+
+	t.Run("numbers only", func(t *testing.T) {
+		input := "739"
+		compare(t, input, 79)
 	})
 }
 
