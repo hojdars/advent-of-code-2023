@@ -38,7 +38,7 @@ func ParseLine(line string) (int, error) {
 			for index, number := range letters {
 				if checkForWord(line, i, number) {
 					first, last = updateFirstLast(index+1, first)
-					i += len(number) - 1
+					i += len(number) - 1 // - 1 to prevent 'oneight' ignoring the eight
 					found = true
 					break
 				}

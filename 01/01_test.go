@@ -10,8 +10,11 @@ func TestLineRead(t *testing.T) {
 	})
 
 	t.Run("one number", func(t *testing.T) {
-		input := "treb7uchet"
-		compare(t, input, 77)
+		compare(t, "treb7uchet", 77)
+	})
+
+	t.Run("numbers only", func(t *testing.T) {
+		compare(t, "739", 79)
 	})
 
 	t.Run("no numbers", func(t *testing.T) {
@@ -20,11 +23,6 @@ func TestLineRead(t *testing.T) {
 		if err == nil {
 			t.Errorf("wanted error, got nil and value %d", got)
 		}
-	})
-
-	t.Run("numbers only", func(t *testing.T) {
-		input := "739"
-		compare(t, input, 79)
 	})
 
 	t.Run("numbers as words mixed in", func(t *testing.T) {
