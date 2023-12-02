@@ -88,15 +88,22 @@ func main() {
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 
-	sum := 0
+	sumPart1 := 0
+	sumPart2 := 0
 	for scanner.Scan() {
 		line := scanner.Text()
 		game := ParseLine(line)
 		maxes := game.GetMax()
+
+		// Part 1
 		if maxes[0] <= 12 && maxes[1] <= 13 && maxes[2] <= 14 {
-			sum += game.id
+			sumPart1 += game.id
 		}
+
+		// Part 2
+		num := maxes[0] * maxes[1] * maxes[2]
+		sumPart2 += num
 	}
 
-	fmt.Println(sum)
+	fmt.Printf("part 1 answer=%v, part 2 answer=%v\n", sumPart1, sumPart2)
 }
