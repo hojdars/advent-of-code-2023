@@ -109,7 +109,7 @@ func GetNeighbourCoords(target Coord, len int) map[Coord]struct{} {
 	return result
 }
 
-func main() {
+func load() (symbols map[Coord]struct{}, numbers map[Coord]Number, gears []Coord) {
 	file, err := os.Open("input/input")
 	if err != nil {
 		fmt.Println("error opening file")
@@ -117,27 +117,33 @@ func main() {
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 
-	symbolMap := make(map[Coord]struct{}, 0)
-	numbersList := make(map[Coord]Number, 0)
-	gearsList := make([]Coord, 0)
+	symbols = make(map[Coord]struct{}, 0)
+	numbers = make(map[Coord]Number, 0)
+	gears = make([]Coord, 0)
 
-	result := 0
 	lineNumber := 0
 	for scanner.Scan() {
 		line := scanner.Text()
-		symbols, numbers, gears := ParseLine(line, lineNumber)
-		for _, s := range symbols {
-			symbolMap[s] = struct{}{}
+		syms, nums, gs := ParseLine(line, lineNumber)
+		for _, s := range syms {
+			symbols[s] = struct{}{}
 		}
-		for _, n := range numbers {
-			numbersList[n.coords] = n
+		for _, n := range nums {
+			numbers[n.coords] = n
 		}
-		gearsList = append(gearsList, gears...)
+		gears = append(gears, gs...)
 		lineNumber++
 	}
 
+	return
+}
+
+func main() {
+	symbols, numbers, gears := load()
+
+	numberResult := 0
 	maximumNumLen := 0
-	for coords, number := range numbersList {
+	for coords, number := range numbers {
 		if number.len > maximumNumLen {
 			maximumNumLen = number.len
 		}
@@ -145,7 +151,7 @@ func main() {
 		neighbours := GetNeighbourCoords(coords, number.len)
 		isPart := false
 		for n := range neighbours {
-			_, ok := symbolMap[n]
+			_, ok := symbols[n]
 			if ok {
 				isPart = true
 				break
@@ -153,36 +159,26 @@ func main() {
 		}
 
 		if isPart {
-			result += number.value
+			numberResult += number.value
 		}
 	}
 
-	fmt.Printf("3-1 solution=%d\n", result)
+	fmt.Printf("3-1 solution=%d\n", numberResult)
 
 	gearResult := 0
-	for _, gear := range gearsList {
+	for _, gear := range gears {
 		numFound := 0
 		sum := 1
+		// only check nearby cells for present numbers
 		for i := -1; i < maximumNumLen+1; i++ {
-			top := Coord{gear.x - i, gear.y - 1}
-			center := Coord{gear.x - i, gear.y}
-			down := Coord{gear.x - i, gear.y + 1}
-
-			t, topOk := numbersList[top]
-			c, centerOk := numbersList[center]
-			d, downOk := numbersList[down]
-
-			if topOk && t.len >= i {
-				numFound++
-				sum *= t.value
-			}
-			if centerOk && c.len >= i {
-				numFound++
-				sum *= c.value
-			}
-			if downOk && d.len >= i {
-				numFound++
-				sum *= d.value
+			for j := -1; j <= 1; j++ {
+				coord := Coord{gear.x - i, gear.y + j}
+				num, ok := numbers[coord]
+				// if number is 3 cells to the left, it has to have length 3 or more to count
+				if ok && num.len >= i {
+					numFound++
+					sum *= num.value
+				}
 			}
 		}
 		if numFound == 2 {
