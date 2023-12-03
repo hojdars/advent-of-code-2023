@@ -39,23 +39,33 @@ func TestParseNumber(t *testing.T) {
 func TestParseLine(t *testing.T) {
 	t.Run("test 1", func(t *testing.T) {
 		line := "..35.&..633.*"
-		symbols, numbers := ParseLine(line, 0)
+		symbols, numbers, gears := ParseLine(line, 0)
 		correctSymbols := []Coord{{5, 0}, {12, 0}}
 		correctNumbers := []Number{{35, Coord{2, 0}, 2}, {633, Coord{8, 0}, 3}}
 		compareLine(t, symbols, correctSymbols, numbers, correctNumbers)
+
+		correctGears := []Coord{{12, 0}}
+		if !reflect.DeepEqual(gears, correctGears) {
+			t.Errorf("got %v, want %v", gears, correctGears)
+		}
 	})
 
 	t.Run("test 2", func(t *testing.T) {
 		line := "...$.*...."
-		symbols, numbers := ParseLine(line, 0)
+		symbols, numbers, gears := ParseLine(line, 0)
 		correctSymbols := []Coord{{3, 0}, {5, 0}}
 		var correctNumbers []Number = nil
 		compareLine(t, symbols, correctSymbols, numbers, correctNumbers)
+
+		correctGears := []Coord{{5, 0}}
+		if !reflect.DeepEqual(gears, correctGears) {
+			t.Errorf("got %v, want %v", gears, correctGears)
+		}
 	})
 
 	t.Run("test 3", func(t *testing.T) {
 		line := ".....+.58."
-		symbols, numbers := ParseLine(line, 0)
+		symbols, numbers, _ := ParseLine(line, 0)
 		correctSymbols := []Coord{{5, 0}}
 		correctNumbers := []Number{{58, Coord{7, 0}, 2}}
 		compareLine(t, symbols, correctSymbols, numbers, correctNumbers)
@@ -63,7 +73,7 @@ func TestParseLine(t *testing.T) {
 
 	t.Run("test 4", func(t *testing.T) {
 		line := "..592....."
-		symbols, numbers := ParseLine(line, 0)
+		symbols, numbers, _ := ParseLine(line, 0)
 		var correctSymbols []Coord = nil
 		correctNumbers := []Number{{592, Coord{2, 0}, 3}}
 		compareLine(t, symbols, correctSymbols, numbers, correctNumbers)
@@ -71,7 +81,7 @@ func TestParseLine(t *testing.T) {
 
 	t.Run("test 5", func(t *testing.T) {
 		line := "1/592=...."
-		symbols, numbers := ParseLine(line, 0)
+		symbols, numbers, _ := ParseLine(line, 0)
 		correctSymbols := []Coord{{1, 0}, {5, 0}}
 		correctNumbers := []Number{{1, Coord{0, 0}, 1}, {592, Coord{2, 0}, 3}}
 		compareLine(t, symbols, correctSymbols, numbers, correctNumbers)
@@ -79,7 +89,7 @@ func TestParseLine(t *testing.T) {
 
 	t.Run("test 6", func(t *testing.T) {
 		line := ".....+.58"
-		symbols, numbers := ParseLine(line, 0)
+		symbols, numbers, _ := ParseLine(line, 0)
 		correctSymbols := []Coord{{5, 0}}
 		correctNumbers := []Number{{58, Coord{7, 0}, 2}}
 		compareLine(t, symbols, correctSymbols, numbers, correctNumbers)

@@ -55,7 +55,7 @@ func ParseNumber(line string, start int) (result, nextEmpty, length int) {
 	return
 }
 
-func ParseLine(line string, y int) (symbols []Coord, numbers []Number) {
+func ParseLine(line string, y int) (symbols []Coord, numbers []Number, gears []Coord) {
 	isNumber := func(c byte) bool { return c >= '0' && c <= '9' }
 
 	pos := 0
@@ -68,6 +68,9 @@ func ParseLine(line string, y int) (symbols []Coord, numbers []Number) {
 			pos = SkipEmpty(line, pos)
 		} else {
 			symbols = append(symbols, Coord{pos, y})
+			if line[pos] == '*' {
+				gears = append(gears, Coord{pos, y})
+			}
 			pos++
 		}
 	}
@@ -115,22 +118,31 @@ func main() {
 	scanner := bufio.NewScanner(file)
 
 	symbolMap := make(map[Coord]struct{}, 0)
-	numbersList := make([]Number, 0)
+	numbersList := make(map[Coord]Number, 0)
+	gearsList := make([]Coord, 0)
 
 	result := 0
 	lineNumber := 0
 	for scanner.Scan() {
 		line := scanner.Text()
-		symbols, numbers := ParseLine(line, lineNumber)
+		symbols, numbers, gears := ParseLine(line, lineNumber)
 		for _, s := range symbols {
 			symbolMap[s] = struct{}{}
 		}
-		numbersList = append(numbersList, numbers...)
+		for _, n := range numbers {
+			numbersList[n.coords] = n
+		}
+		gearsList = append(gearsList, gears...)
 		lineNumber++
 	}
 
-	for _, number := range numbersList {
-		neighbours := GetNeighbourCoords(number.coords, number.len)
+	maximumNumLen := 0
+	for coords, number := range numbersList {
+		if number.len > maximumNumLen {
+			maximumNumLen = number.len
+		}
+
+		neighbours := GetNeighbourCoords(coords, number.len)
 		isPart := false
 		for n := range neighbours {
 			_, ok := symbolMap[n]
@@ -145,5 +157,38 @@ func main() {
 		}
 	}
 
-	fmt.Printf("%d\n", result)
+	fmt.Printf("3-1 solution=%d\n", result)
+
+	gearResult := 0
+	for _, gear := range gearsList {
+		numFound := 0
+		sum := 1
+		for i := -1; i < maximumNumLen+1; i++ {
+			top := Coord{gear.x - i, gear.y - 1}
+			center := Coord{gear.x - i, gear.y}
+			down := Coord{gear.x - i, gear.y + 1}
+
+			t, topOk := numbersList[top]
+			c, centerOk := numbersList[center]
+			d, downOk := numbersList[down]
+
+			if topOk && t.len >= i {
+				numFound++
+				sum *= t.value
+			}
+			if centerOk && c.len >= i {
+				numFound++
+				sum *= c.value
+			}
+			if downOk && d.len >= i {
+				numFound++
+				sum *= d.value
+			}
+		}
+		if numFound == 2 {
+			gearResult += sum
+		}
+	}
+
+	fmt.Printf("3-2 solution=%d\n", gearResult)
 }
